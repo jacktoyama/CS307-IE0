@@ -93,8 +93,6 @@ const findUserByNameAndJob = (name, job) => {
 app.get("/users", (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
-    console.log("job = ", job);
-    console.log("name = ", name);
     if (job != undefined && name != undefined) {
         let result = findUserByNameAndJob(name, job);
         result = { users_list: result };
@@ -129,7 +127,7 @@ const addUser = (user) => {
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
-    res.send();
+    res.status(201).send("successful user insertion");
 });
 
 const findIndex = (id) => {

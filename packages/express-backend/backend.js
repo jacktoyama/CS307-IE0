@@ -143,5 +143,5 @@ app.delete("/users/:id", (req, res) => {
     const id = req.params["id"];
     let index = findIndex(id);
     users["users_list"].splice(index, 1);
-    res.send();
+    res.status(204).send();
 });

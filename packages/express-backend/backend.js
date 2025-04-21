@@ -120,6 +120,7 @@ app.listen(port, () => {
 });
 
 const addUser = (user) => {
+    user.id = String(Math.floor(Math.random() * 900) + 11);
     users["users_list"].push(user);
     return user;
 };

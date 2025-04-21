@@ -128,7 +128,7 @@ const addUser = (user) => {
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
-    res.status(201).send("successful user insertion");
+    res.status(201).send(userToAdd);
 });
 
 const findIndex = (id) => {

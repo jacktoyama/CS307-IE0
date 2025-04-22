@@ -133,15 +133,21 @@ app.post("/users", (req, res) => {
 
 const findIndex = (id) => {
     for (let i = 0; i < users["users_list"].length; i++) {
-        if (users["users_list"].id === id) {
+        if (users["users_list"][i].id === id) {
             return i;
         };
     };
+    return -1;
 };
 
 app.delete("/users/:id", (req, res) => {
     const id = req.params["id"];
     let index = findIndex(id);
+
+    if (index === -1) {
+        return res.status(404).send("User not found");
+    }
+
     users["users_list"].splice(index, 1);
     res.status(204).send();
 });

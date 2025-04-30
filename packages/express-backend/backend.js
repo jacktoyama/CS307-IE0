@@ -1,7 +1,18 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import userService from "./services/user-services.js"
 
+dotenv.config();
+
+const { MONGO_CONNECTION_STRING } = process.env;
+
+mongoose.set("debug", true);
+mongoose
+  .connect(MONGO_CONNECTION_STRING + "users") // connect to Db "users"
+  .catch((error) => console.log(error));
 
 const app = express();
 const port = 8000;
@@ -93,24 +104,10 @@ const findUserByNameAndJob = (name, job) => {
 app.get("/users", (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
-    if (job != undefined && name != undefined) {
-        let result = findUserByNameAndJob(name, job);
-        result = { users_list: result };
-        console.log(result);
-        res.send(result);
-    }
-    else if (job != undefined) {
-        let result = findUserByJob(job);
-        result = { users_list: result };
-        res.send(result);
-    }
-    else if (name != undefined) {
-        let result = findUserByName(name);
-        result = { users_list: result };
-        res.send(result);
-    } else {
-        res.send(users);
-    }
+    const promise = userService.getUsers(name, job);
+    promise.then((list) => {
+        res.send(list);
+    })
   });
 
 app.listen(port, () => {
@@ -141,13 +138,17 @@ const findIndex = (id) => {
 };
 
 app.delete("/users/:id", (req, res) => {
-    const id = req.params["id"];
-    let index = findIndex(id);
+    const id = req.params.id;
 
-    if (index === -1) {
-        return res.status(404).send("User not found");
-    }
-
-    users["users_list"].splice(index, 1);
-    res.status(204).send();
+    userService.deleteUser(id)
+        .then((result) => {
+            if (!result) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            res.status(204).send();
+        })
+        .catch((err) => {
+            console.error("Error deleting user:", err);
+            res.status(500).json({ error: "Internal server error" });
+        });
 });
